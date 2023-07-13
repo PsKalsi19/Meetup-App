@@ -12,10 +12,11 @@ const Event = () => {
       eventsData: { meetups },
       selectedEvent,
     },
+    setShowModal,
     dispatchProjectData,
   } = useContext(DataContext);
 
-  console.log(selectedEvent);
+  const isEventAvailable = new Date(selectedEvent?.eventEndTime) > new Date();
   useEffect(() => {
     dispatchProjectData({
       type: ACTIONS.SET_SELECTED_EVENT,
@@ -27,7 +28,7 @@ const Event = () => {
       {selectedEvent && Object.keys(selectedEvent).length > 0 && (
         <>
           <div className="grid grid-cols-4 px-32 py-4">
-            <div className="flex flex-col col-span-3 space-y-4">
+            <div className="flex flex-col space-y-4 md:col-span-3">
               <h3 className="text-4xl font-extrabold text-gray-800">
                 {selectedEvent?.title}
               </h3>
@@ -67,7 +68,7 @@ const Event = () => {
                 ))}
               </div>
             </div>
-            <div className="w-full col-span-1 ">
+            <div className="w-full md:col-span-1">
               <div className="flex flex-col w-full p-4 space-y-4 bg-white shadow-sm">
                 <div className="flex flex-row items-center space-x-4">
                   <svg
@@ -132,16 +133,38 @@ const Event = () => {
               </div>
 
               <div className="mt-8">
-              <h3 className="text-2xl font-semibold text-gray-800">
-                Speakers:
-              </h3>   
-
-              {
-                selectedEvent?.speakers.map(ele=><div key={ele.name} className="bg-white shadow-xl">
-
-                </div>)
-              }
+                <h3 className="text-2xl font-semibold text-gray-800">
+                  Speakers:
+                </h3>
+                <div className="flex">
+                  {selectedEvent?.speakers.map((ele) => (
+                    <div
+                      key={ele.name}
+                      className="flex flex-col items-center justify-center px-2 py-4 m-4 bg-white shadow-xl"
+                    >
+                      <img
+                        className="w-16 h-16 rounded-full"
+                        src={ele.image}
+                        alt={ele.name}
+                      />
+                      <p className="w-full font-semibold text-center">
+                        {ele.name}
+                      </p>
+                      <p className="text-sm text-center">{ele.designation}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
+
+              {isEventAvailable && (
+                <button
+                disabled={selectedEvent.price!=='Free'}
+                  onClick={()=>setShowModal(true)}
+                  className={`w-full px-6 py-2 my-8 rounded-md hover:bg-red-500 text-gray-50 ${selectedEvent.price!=='Free'? 'bg-red-200 cursor-not-allowed':'bg-red-400'}`}
+                >
+                  {selectedEvent.isRSVPed ? "Already RSVPed" : " RSVP"}
+                </button>
+              )}
             </div>
           </div>
         </>
